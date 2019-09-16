@@ -1,0 +1,1 @@
+# Docker compose all in one
