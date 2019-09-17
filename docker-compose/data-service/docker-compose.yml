@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: blockchain
     ports:
-      - '5555:5432'
+      - '5432:5432'
   crawler:
     image: wavesplatform/blockchain-postgres-sync
     restart: always

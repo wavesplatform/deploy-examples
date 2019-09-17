@@ -1,1 +1,25 @@
 version: '3'
+services:
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: blockchain
+    ports:
+      - '5555:5432'
+  crawler:
+    image: wavesplatform/blockchain-postgres-sync
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      # FIX after node example
+      NODE_ADDRESS: 'nodes.wavesnodes.com'
+      PGHOST: 'postgres'
+      PGPORT: 5432
+      PGDATABASE: 'blockchain'
+      PGUSER: 'postgres'
+      PGPASSWORD: 'postgres'
+      MIGRATE: 'true'
