@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: blockchain
     ports:
       - '5432:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql
   crawler:
     image: wavesplatform/blockchain-postgres-sync
     restart: always
