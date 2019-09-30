@@ -23,3 +23,22 @@ services:
       PGUSER: 'postgres'
       PGPASSWORD: 'postgres'
       MIGRATE: 'true'
+  data-service:
+    image: wavesplatform/data-service
+    restart: always
+    depends_on:
+      - crawler
+    environment:
+      PORT: 3000
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: blockchain
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGPOOLSIZE: 20
+      LOG_LEVEL: info
+      # default matcher for mainnet
+      DEFAULT_MATCHER: 3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3
+      MATCHER_SETTINGS_URL: https://matcher.wavesplatform.com/matcher/settings
+    ports:
+      - '3000:3000'
