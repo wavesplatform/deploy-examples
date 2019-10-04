@@ -1,5 +1,20 @@
 version: '3'
 services:
+  node:
+    image: wavesplatform/wavesnode
+    restart: always
+    environment:
+      WAVES_NETWORK: mainnet
+      WAVES_LOG_LEVEL: INFO
+      WAVES_HEAP_SIZE: 2g
+      WAVES_WALLET_SEED: SEED
+      WAVES_WALLET_PASSWORD: PASSWORD
+      JAVA_OPTS: '-Dwaves.network.declared-address=0.0.0.0:6868 -Dwaves.rest-api.port=6870 -Dwaves.rest-api.bind-address=0.0.0.0 -Dwaves.rest-api.enable=yes'
+    ports:
+      - '6868:6868'
+      - '6870:6870'
+    volumes:
+      - ./waves-data:/var/lib/waves
   postgres:
     image: postgres:alpine
     restart: always
@@ -8,17 +23,17 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: blockchain
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - ./postgres-data:/var/lib/postgresql
   crawler:
     image: wavesplatform/blockchain-postgres-sync
     restart: always
     depends_on:
+      - node
       - postgres
     environment:
-      # FIX after node example
-      NODE_ADDRESS: 'nodes.wavesnodes.com'
+      NODE_ADDRESS: node:6870
       PGHOST: 'postgres'
       PGPORT: 5432
       PGDATABASE: 'blockchain'
@@ -39,7 +54,6 @@ services:
       PGPASSWORD: postgres
       PGPOOLSIZE: 20
       LOG_LEVEL: info
-      # default matcher for mainnet
       DEFAULT_MATCHER: 3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3
       MATCHER_SETTINGS_URL: https://matcher.wavesplatform.com/matcher/settings
     ports:

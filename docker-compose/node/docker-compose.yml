@@ -1,1 +1,17 @@
 version: '3'
+services:
+  node:
+    image: wavesplatform/wavesnode
+    restart: always
+    environment:
+      WAVES_NETWORK: mainnet
+      WAVES_LOG_LEVEL: INFO
+      WAVES_HEAP_SIZE: 2g
+      WAVES_WALLET_SEED: SEED
+      WAVES_WALLET_PASSWORD: PASSWORD
+      JAVA_OPTS: '-Dwaves.network.declared-address=0.0.0.0:6868 -Dwaves.rest-api.port=6870 -Dwaves.rest-api.bind-address=0.0.0.0 -Dwaves.rest-api.enable=yes'
+    ports:
+      - '6868:6868'
+      - '6870:6870'
+    volumes:
+      - ./waves-data:/var/lib/waves

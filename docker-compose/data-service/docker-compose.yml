@@ -17,7 +17,6 @@ services:
     depends_on:
       - postgres
     environment:
-      # Mainnet nodes pool (for production use self node without rate limiting)
       NODE_ADDRESS: 'nodes.wavesnodes.com'
       PGHOST: 'postgres'
       PGPORT: 5432
@@ -39,7 +38,6 @@ services:
       PGPASSWORD: postgres
       PGPOOLSIZE: 20
       LOG_LEVEL: info
-      # default matcher for mainnet
       DEFAULT_MATCHER: 3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3
       MATCHER_SETTINGS_URL: https://matcher.wavesplatform.com/matcher/settings
     ports:
