@@ -1,0 +1,18 @@
+version: "3"
+services:
+  waves-node:
+    image: wavesplatform/waves-private-node
+    volumes:
+      - "./data:/opt/waves/data"
+    ports:
+      - "6869:6869"
+      - "6860:6860"
+  devnet:
+    build: ./
+    environment:
+      NODE_ADDRESS: waves-node:6869
+    ports:
+      - "5432:5432"
+      - "3010:3010"
+    links:
+      - waves-node
