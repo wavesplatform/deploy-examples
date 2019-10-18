@@ -1,0 +1,200 @@
+postgresql:
+  # Whether to run local PostgreSQL
+  # 'false' for remote PostgreSQL
+  enabled: true
+  # PostgreSQL server Version
+  imageTag: '11.5'
+  # PostgreSQL server host (only for remote PostgreSQL)
+  host: 'localhost'
+  # PostgreSQL server port 
+  service:
+    port: 5432
+  # Database name
+  postgresDatabase: 'mainnet'
+  # Creds for PostgreSQL user
+  # In case local PostgreSQL this user will automatically be created
+  postgresUser: 'postgres'
+  postgresPassword: 'postgres'
+
+  persistence:
+    size: 200Gi
+
+# You can use public docker registry (by default)
+# Or you can use your private docker registry
+dockerRegistryCredentials: {}
+
+# Waves Node url. Used by crawler to get blockchain data via REST API
+nodeUrl: 'https://nodes.wavesnodes.com'
+
+# Data service Crawler
+# Loads data from Blockchain node (nodeUrl) and save it to PostgreSQL
+crawler:
+  image: 'wavesplatform/blockchain-postgres-sync'
+  imageTag: 'latest'
+  imagePullPolicy: Always
+  
+  # How many blocks to fetch on single download request.
+  blocksPerRequest: 100
+
+  # Determines what to do if blocks on this height already exists in the database. 
+  # Possible options:
+  # 'nothing' — never update, skip block
+  # 'update' — update only if block's signature is different
+  # 'updateForce' — always update
+  onConflict: 'nothing'
+
+  # Minimal interval between initiating updates
+  updateThrottleInterval: 500
+
+  # Whether to apply migrations
+  # You must to set 'true' at first time to apply initial migrations
+  # and then you may set 'false' (but we don't recommend to do this)
+  migrate: 'true'
+
+# Data Service REST API
+dataService:
+  enabled: true
+  image: 'wavesplatform/data-service'
+  imageTag: 'latest'
+  imagePullPolicy: Always
+  pgPoolSize: 20
+
+  # Deployment and Container port
+  port: 3000
+
+  # Back compatibility parameter
+  # Pairs and candles API uses it
+  defaultMatcherAddress: '3PJaDyprvekvPXPuAtxrapacuDJopgJRaU3'
+
+  replicasCount: 1
+
+  # Data service Deployment resources
+  resources: {}
+    # requests:
+    #   memory: '512Mi'
+    #   cpu: '700m'
+    # limits:
+    #   memory: '1024Mi'
+    #   cpu: '1000m'
+
+  # Cache layer based on nginx
+  cache:
+    # Data service cache Deployment resources
+    resources: {}
+      # requests:
+      #   memory: '256Mi'
+      #   cpu: '200m'
+      # limits:
+      #   memory: '512Mi'
+      #   cpu: '400m'
+
+    # DataService cache Service settings
+    service:
+      type: NodePort
+      port: 80
+      ## Manually set NodePort value
+      ## Requires service.type: NodePort
+      nodePort: 30001
+
+  # Candles calculation via exchange txs data
+  candles:
+    enabled: true
+    image: 'wavesplatform/data-service-candles'
+    imageTag: latest
+    imagePullPolicy: Always
+
+    # Minimum daemon update time in ms. 
+    # If time is exceeded, the next iteration starts immediately
+    updateInterval: 2500
+
+    # If the update timeout in ms is exceeded, the daemon terminates
+    updateTimeout: 20000
+
+    # Whether to truncate all data from candles table and recalculate all candles
+    recalculationOnStart: false
+
+    # Data service Candles daemon Deployment resources
+    resources: {}
+      # requests:
+      #   memory: '128Mi'
+      #   cpu: '50m'
+      # limits:
+      #   memory: '160Mi'
+      #   cpu: '200m'
+  
+  # Pairs calculation via exchange txs data
+  pairs:
+    enabled: true
+    image: 'wavesplatform/data-service-pairs'
+    imageTag: latest
+    imagePullPolicy: Always
+
+    # Minimum daemon update time in ms. 
+    # If time is exceeded, the next iteration starts immediately
+    updateInterval: 2500
+
+    # If the update timeout in ms is exceeded, the daemon terminates
+    updateTimeout: 20000
+
+    # Data service Pairs daemon Deployment resources
+    resources: {}
+      # requests:
+      #   memory: '128Mi'
+      #   cpu: '50m'
+      # limits:
+      #   memory: '160Mi'
+      #   cpu: '200m'
+
+docs:
+  enabled: true
+  image: 'wavesplatform/data-service-docs'
+  imageTag: 'latest'
+  imagePullPolicy: Always
+
+  # host:port
+  # host - your k8s cluster host
+  # port - docs cache service port
+  url: 'localhost:30002'
+
+  # Data service Docs Deployment resources
+  resources:
+    requests:
+      memory: '16Mi'
+      cpu: '5m'
+    limits:
+      memory: '32Mi'
+      cpu: '20m'
+
+  # Docs, same as DataService, has cache layer based on nginx
+  cache: 
+    # Docs cache Deployment resources
+    resources: {}
+    # 
+    # requests:
+    #   memory: '32Mi'
+    #   cpu: '10m'
+    # limits:
+    #   memory: '64Mi'
+    #   cpu: '50m'
+
+    # Docs cache Service settings
+    service: 
+      type: NodePort
+      port: 80
+      ## Manually set NodePort value
+      ## Requires service.type: NodePort
+      nodePort: 30002
+
+
+# Allow to constrain pods to nodes with particular labels
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity 
+affinity: {}
+
+# Allow (but do not require) the pods to schedule onto nodes with matching taints
+# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: {}
+
+
+# Node labels for pod assignment
+# ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}

@@ -1,0 +1,71 @@
+{{- if .Capabilities.APIVersions.Has "apps/v1beta1" }}
+apiVersion: apps/v1beta1
+{{- else }}
+apiVersion: apps/v1
+{{- end }}
+kind: Deployment
+metadata:
+  name: crawler
+spec:
+  minReadySeconds: 60
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: crawler
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: crawler
+    spec:
+      imagePullSecrets:
+        - name: docker-registry-creds
+      containers:
+        - name: crawler
+          image: {{ .Values.crawler.image }}:{{ .Values.crawler.imageTag }}
+          imagePullPolicy: {{ .Values.crawler.imagePullPolicy }}
+          env:
+            - name: NODE_ADDRESS
+              value: {{ .Values.nodeUrl }}
+            - name: PGHOST
+              value: {{ template "postgresHost" . }}
+            - name: PGPORT
+              value: {{ .Values.postgresql.service.port | quote }}
+            - name: PGDATABASE
+              value: {{ .Values.postgresql.postgresDatabase }}
+            - name: BLOCKS_PER_REQUEST
+              value: '{{ .Values.crawler.blocksPerRequest }}'
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-creds-{{ .Release.Name }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-creds-{{ .Release.Name }}
+                  key: password
+            - name: ON_CONFLICT
+              value: {{ .Values.crawler.onConflict }}
+            - name: UPDATE_THROTTLE_INTERVAL
+              value: {{ .Values.crawler.updateThrottleInterval | quote }}
+            - name: MIGRATE
+              value: {{ .Values.crawler.migrate | quote }}
+        {{- with .Values.crawler.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+        {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

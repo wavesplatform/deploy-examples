@@ -1,0 +1,19 @@
+{{- if .Values.dataService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache
+  labels:
+    app: cache
+spec:
+  type: {{ .Values.dataService.cache.service.type }}
+  ports:
+    - port: {{ .Values.dataService.cache.service.port }}
+      targetPort: {{ .Values.dataService.port }}
+      protocol: TCP
+      {{- if (eq .Values.dataService.cache.service.type "NodePort") }}
+      nodePort: {{ .Values.dataService.cache.service.nodePort }}
+      {{- end }}
+  selector:
+    app: data-service
+{{- end }}

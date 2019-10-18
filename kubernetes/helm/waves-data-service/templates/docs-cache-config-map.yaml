@@ -1,0 +1,50 @@
+{{- if .Values.docs.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docs-cache
+data:
+  nginx.conf: |
+    worker_processes auto;
+    events { worker_connections 4096; multi_accept on; }
+
+    http {
+      #cache
+      proxy_cache_path /tmp/cache levels=1:2 keys_zone=DOCS:30m max_size=100m;
+      proxy_temp_path /tmp/cache/tmp;
+      proxy_cache DOCS;
+      proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+      proxy_cache_bypass $http_upgrade;
+      add_header X-Cache-Status $upstream_cache_status;
+      add_header Cache-Control "public, max-age=60";
+      
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+
+      gzip on;
+      gzip_disable "msie6";
+      gzip_comp_level 6;
+      gzip_vary on;
+      gzip_min_length 1400;
+      gzip_proxied any;
+      gzip_types application/json;
+      gzip_buffers 16 8k;
+
+      proxy_http_version 1.1;
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+
+      server {
+        listen {{ .Values.docs.cache.service.port }} default_server;
+        server_name _;
+
+        location / {
+          proxy_pass http://docs;
+          proxy_cache_valid any 1m;
+        }
+      }
+    }
+{{- end }}

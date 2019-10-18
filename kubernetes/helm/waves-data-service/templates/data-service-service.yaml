@@ -1,0 +1,13 @@
+{{- if .Values.dataService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-service
+  labels:
+    app: data-service
+spec:
+  ports:
+    - port: {{ .Values.dataService.port }}
+  selector:
+    app: data-service
+{{- end }}

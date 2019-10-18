@@ -1,0 +1,67 @@
+{{- if .Values.dataService.pairs.enabled }}
+{{- if .Capabilities.APIVersions.Has "apps/v1beta1" }}
+apiVersion: apps/v1beta1
+{{- else }}
+apiVersion: apps/v1
+{{- end }}
+kind: Deployment
+metadata:
+  name: pairs
+spec:
+  minReadySeconds: 60
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: pairs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pairs
+    spec:
+      imagePullSecrets:
+        - name: docker-registry-creds
+      containers:
+        - name: pairs
+          image: {{ .Values.dataService.pairs.image }}:{{ .Values.dataService.pairs.imageTag }}
+          imagePullPolicy: {{ .Values.dataService.pairs.imagePullPolicy }}
+          env:
+            - name: PGHOST
+              value: {{ template "postgresHost" . }}
+            - name: PGPORT
+              value: {{ .Values.postgresql.service.port | quote }}
+            - name: PGDATABASE
+              value: {{ .Values.postgresql.postgresDatabase }}
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-creds-{{ .Release.Name }}
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-creds-{{ .Release.Name }}
+                  key: password
+            - name: PAIRS_UPDATE_INTERVAL
+              value: {{ .Values.dataService.pairs.updateInterval | quote }}
+            - name: PAIRS_UPDATE_TIMEOUT
+              value: {{ .Values.dataService.pairs.updateTimeout | quote }}
+        {{- with .Values.dataService.pairs.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+        {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}

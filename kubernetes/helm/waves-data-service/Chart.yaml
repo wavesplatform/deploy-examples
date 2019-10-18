@@ -1,0 +1,7 @@
+name: waves-data-service
+version: 1.0.0
+type: application
+home: https://github.com/wavesplatform/data-service
+source:
+  - https://github.com/wavesplatform/data-service
+appVersion: 0.26.0

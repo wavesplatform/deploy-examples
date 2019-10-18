@@ -1,0 +1,15 @@
+{{- if .Values.docs.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: docs
+  labels:
+    app: docs
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: docs
+{{- end }}

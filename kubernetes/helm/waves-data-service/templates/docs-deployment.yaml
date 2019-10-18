@@ -1,0 +1,64 @@
+{{- if .Values.docs.enabled }}
+{{- if .Capabilities.APIVersions.Has "apps/v1beta1" }}
+apiVersion: apps/v1beta1
+{{- else }}
+apiVersion: apps/v1
+{{- end }}
+kind: Deployment
+metadata:
+  name: docs
+spec:
+  minReadySeconds: 15
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: docs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: docs
+    spec:
+      imagePullSecrets:
+        - name: docker-registry-creds
+      containers:
+        - name: docs
+          image: {{ .Values.docs.image }}:{{ .Values.docs.imageTag }}
+          imagePullPolicy: {{ .Values.docs.imagePullPolicy }}
+          env:
+            - name: SWAGGER_JSON
+              value: '/app/openapi.json'
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            successThreshold: 1
+          {{- with .Values.docs.resources }}
+{{ toYaml . | indent 10 }}
+          {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}

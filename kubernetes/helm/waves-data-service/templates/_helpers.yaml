@@ -1,0 +1,19 @@
+{{- define "imagePullSecret" }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.dockerRegistryCredentials.registry (printf "%s:%s" .Values.dockerRegistryCredentials.username .Values.dockerRegistryCredentials.password | b64enc) | b64enc }}
+{{- end }}
+
+{{- define "postgresHost" }}
+{{- if .Values.postgresql.enabled }}
+{{- printf "%s-postgresql" .Release.Name }}
+{{- else }}
+{{ .Values.postgresql.host }}
+{{- end }}
+{{- end }}
+
+{{- define "postgresUser" }}
+{{- printf "%s" .Values.postgresql.postgresUser | b64enc }}
+{{- end }}
+
+{{- define "postgresPassword" }}
+{{- printf "%s" .Values.postgresql.postgresPassword | b64enc }}
+{{- end }}

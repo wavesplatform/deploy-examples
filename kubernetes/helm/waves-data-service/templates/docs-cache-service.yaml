@@ -1,0 +1,18 @@
+{{- if .Values.docs.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: docs-cache
+  labels:
+    app: docs-cache
+spec:
+  type: {{ .Values.docs.cache.service.type }}
+  ports:
+    - port: {{ .Values.docs.cache.service.port }}
+      protocol: TCP
+      {{- if (eq .Values.docs.cache.service.type "NodePort") }}
+      nodePort: {{ .Values.docs.cache.service.nodePort }}
+      {{- end }}
+  selector:
+    app: docs-cache
+{{- end }}
