@@ -22,31 +22,37 @@ spec:
     spec:
       imagePullSecrets:
         - name: docker-registry-creds
+      initContainers:
+        - name: check-db-ready
+          image: postgres:{{ .Values.postgresql.imageTag }}
+          command: ['sh', '-c', 
+            'until pg_isready -h {{ template "postgresqlHost" . }} -p {{ .Values.postgresql.service.port }} -U postgres;
+            do echo waiting for database; sleep 2; done;']
       containers:
         - name: crawler
           image: {{ .Values.crawler.image }}:{{ .Values.crawler.imageTag }}
           imagePullPolicy: {{ .Values.crawler.imagePullPolicy }}
           env:
             - name: NODE_ADDRESS
-              value: {{ .Values.nodeUrl }}
+              value: {{ .Values.crawler.nodeUrl }}
             - name: PGHOST
-              value: {{ template "postgresHost" . }}
+              value: {{ template "postgresqlHost" . }}
             - name: PGPORT
               value: {{ .Values.postgresql.service.port | quote }}
             - name: PGDATABASE
-              value: {{ .Values.postgresql.postgresDatabase }}
-            - name: BLOCKS_PER_REQUEST
-              value: '{{ .Values.crawler.blocksPerRequest }}'
+              value: {{ .Values.postgresql.postgresqlDatabase }}
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-creds-{{ .Release.Name }}
+                  name: postgres-creds-writer-{{ .Release.Name }}
                   key: username
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-creds-{{ .Release.Name }}
+                  name: postgres-creds-writer-{{ .Release.Name }}
                   key: password
+            - name: BLOCKS_PER_REQUEST
+              value: {{ .Values.crawler.blocksPerRequest | quote }}
             - name: ON_CONFLICT
               value: {{ .Values.crawler.onConflict }}
             - name: UPDATE_THROTTLE_INTERVAL

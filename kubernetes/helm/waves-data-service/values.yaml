@@ -2,29 +2,37 @@ postgresql:
   # Whether to run local PostgreSQL
   # 'false' for remote PostgreSQL
   enabled: true
+
   # PostgreSQL server Version
   imageTag: '11.5'
+  image:
+    debug: true
+
   # PostgreSQL server host (only for remote PostgreSQL)
-  host: 'localhost'
-  # PostgreSQL server port 
-  service:
-    port: 5432
+  # host: 'localhost'
+
   # Database name
-  postgresDatabase: 'mainnet'
-  # Creds for PostgreSQL user
-  # In case local PostgreSQL this user will automatically be created
-  postgresUser: 'postgres'
-  postgresPassword: 'postgres'
+  postgresqlDatabase: 'mainnet'
+
+  # Creds for PostgreSQL users
+  postgresqlPassword: 'mypass'
+
+  writer:
+    username: 'writer'
+    password: 'writer'
+  
+  reader:
+    username: 'reader'
+    password: 'reader'
 
   persistence:
     size: 200Gi
 
+  initdbScriptsSecret: 'postgres-initdb-scripts'
+
 # You can use public docker registry (by default)
 # Or you can use your private docker registry
 dockerRegistryCredentials: {}
-
-# Waves Node url. Used by crawler to get blockchain data via REST API
-nodeUrl: 'https://nodes.wavesnodes.com'
 
 # Data service Crawler
 # Loads data from Blockchain node (nodeUrl) and save it to PostgreSQL
@@ -32,9 +40,13 @@ crawler:
   image: 'wavesplatform/blockchain-postgres-sync'
   imageTag: 'latest'
   imagePullPolicy: Always
+
+  # Waves Node url. 
+  # Used to get blockchain data via Node REST API
+  nodeUrl: 'http://data-service-node.wvservices.com:6869'
   
   # How many blocks to fetch on single download request.
-  blocksPerRequest: 100
+  blocksPerRequest: 50
 
   # Determines what to do if blocks on this height already exists in the database. 
   # Possible options:
@@ -92,8 +104,8 @@ dataService:
     service:
       type: NodePort
       port: 80
-      ## Manually set NodePort value
-      ## Requires service.type: NodePort
+      # Manually set NodePort value
+      # Requires service.type: NodePort
       nodePort: 30001
 
   # Candles calculation via exchange txs data
@@ -181,10 +193,9 @@ docs:
     service: 
       type: NodePort
       port: 80
-      ## Manually set NodePort value
-      ## Requires service.type: NodePort
+      # Manually set NodePort value
+      # Requires service.type: NodePort
       nodePort: 30002
-
 
 # Allow to constrain pods to nodes with particular labels
 # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity 
@@ -193,7 +204,6 @@ affinity: {}
 # Allow (but do not require) the pods to schedule onto nodes with matching taints
 # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: {}
-
 
 # Node labels for pod assignment
 # ref: https://kubernetes.io/docs/user-guide/node-selection/

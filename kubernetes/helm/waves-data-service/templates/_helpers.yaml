@@ -2,18 +2,38 @@
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.dockerRegistryCredentials.registry (printf "%s:%s" .Values.dockerRegistryCredentials.username .Values.dockerRegistryCredentials.password | b64enc) | b64enc }}
 {{- end }}
 
-{{- define "postgresHost" }}
+{{- define "postgresqlHost" }}
 {{- if .Values.postgresql.enabled }}
-{{- printf "%s-postgresql" .Release.Name }}
+{{- printf "%s-postgresql-headless" .Release.Name }}
 {{- else }}
 {{ .Values.postgresql.host }}
 {{- end }}
 {{- end }}
 
-{{- define "postgresUser" }}
-{{- printf "%s" .Values.postgresql.postgresUser | b64enc }}
+{{- define "postgresqlPassword" }}
+{{- printf "%s" .Values.postgresql.postgresPassword | b64enc }}
 {{- end }}
 
-{{- define "postgresPassword" }}
-{{- printf "%s" .Values.postgresql.postgresPassword | b64enc }}
+{{- define "postgresqlWriterUser" }}
+{{- printf "%s" .Values.postgresql.writer.username | b64enc }}
+{{- end }}
+
+{{- define "postgresqlWriterPassword" }}
+{{- printf "%s" .Values.postgresql.writer.password | b64enc }}
+{{- end }}
+
+{{- define "postgresqlReaderUser" }}
+{{- printf "%s" .Values.postgresql.reader.username | b64enc }}
+{{- end }}
+
+{{- define "postgresqlReaderPassword" }}
+{{- printf "%s" .Values.postgresql.reader.password | b64enc }}
+{{- end }}
+
+{{- define "createUserWriter" }}
+{{- printf "CREATE USER \"%s\" WITH ENCRYPTED PASSWORD '%s';GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO %s;ALTER USER \"%s\" WITH SUPERUSER;" .Values.postgresql.writer.username .Values.postgresql.writer.password .Values.postgresql.postgresqlDatabase .Values.postgresql.writer.username .Values.postgresql.writer.username | b64enc }}
+{{- end }}
+
+{{- define "createUserReader" }}
+{{- printf "CREATE USER \"%s\" WITH ENCRYPTED PASSWORD '%s';GRANT SELECT ON ALL TABLES IN SCHEMA public to %s;" .Values.postgresql.reader.username .Values.postgresql.reader.password .Values.postgresql.reader.password | b64enc }}
 {{- end }}

@@ -1,3 +1,9 @@
+# 0. Download
+Get helm chart
+
+Download dependencies
+`helm dependencies update waves-data-service`
+
 # 1. Configure
 You can configure chart using `values.yaml` or using `set` argument on start
 

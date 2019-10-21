@@ -15,18 +15,18 @@ spec:
       - name: DEFAULT_MATCHER
         value: {{ .Values.dataService.defaultMatcherAddress }}
       - name: PGHOST
-        value: {{ .Values.postgresql.host }}
+        value: {{ template "postgresqlHost" . }}
       - name: PGDATABASE
-        value: {{ .Values.postgresql.postgresDatabase }}
+        value: {{ .Values.postgresql.postgresqlDatabase }}
       - name: PGUSER
         valueFrom:
           secretKeyRef:
-            name: postgres-creds-{{ .Release.Name }}
+            name: postgres-creds-reader-{{ .Release.Name }}
             key: username
       - name: PGPASSWORD
         valueFrom:
           secretKeyRef:
-            name: postgres-creds-{{ .Release.Name }}
+            name: postgres-creds-reader-{{ .Release.Name }}
             key: password
       - name: PGPOOLSIZE
         value: '{{ .Values.dataService.pgPoolSize }}'
