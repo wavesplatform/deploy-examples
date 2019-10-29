@@ -6,7 +6,7 @@
 {{- if .Values.postgresql.enabled }}
 {{- printf "%s-postgresql-headless" .Release.Name }}
 {{- else }}
-{{ .Values.postgresql.host }}
+{{- printf "%s:%s" .Values.postgresql.host .Values.postgresql.port }}
 {{- end }}
 {{- end }}
 

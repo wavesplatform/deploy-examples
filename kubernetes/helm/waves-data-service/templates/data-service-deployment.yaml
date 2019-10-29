@@ -60,7 +60,7 @@ spec:
             - name: DEFAULT_MATCHER
               value: {{ .Values.dataService.defaultMatcherAddress }}
             - name: DOCS_URL
-              value: '{{ .Values.docs.url }}'
+              value: '{{ .Values.dataService.docs.url }}'
           livenessProbe:
             httpGet:
               path: /

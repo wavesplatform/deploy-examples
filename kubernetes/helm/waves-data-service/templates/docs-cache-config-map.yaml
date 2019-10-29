@@ -1,4 +1,4 @@
-{{- if .Values.docs.enabled }}
+{{- if .Values.dataService.docs.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -38,7 +38,7 @@ data:
       tcp_nodelay on;
 
       server {
-        listen {{ .Values.docs.cache.service.port }} default_server;
+        listen {{ .Values.dataService.docs.cache.service.port }} default_server;
         server_name _;
 
         location / {

@@ -1,4 +1,4 @@
-{{- if .Values.docs.enabled }}
+{{- if .Values.dataService.docs.enabled }}
 {{- if .Capabilities.APIVersions.Has "apps/v1beta1" }}
 apiVersion: apps/v1beta1
 {{- else }}
@@ -36,7 +36,7 @@ spec:
             - name: docs-config-volume
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
-          {{- with .Values.docs.cache.resources }}
+          {{- with .Values.dataService.docs.cache.resources }}
 {{ toYaml . | indent 10 }}
           {{- end }}
       volumes:

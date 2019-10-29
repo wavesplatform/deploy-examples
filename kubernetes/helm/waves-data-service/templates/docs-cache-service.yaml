@@ -1,4 +1,4 @@
-{{- if .Values.docs.enabled }}
+{{- if .Values.dataService.docs.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -6,12 +6,12 @@ metadata:
   labels:
     app: docs-cache
 spec:
-  type: {{ .Values.docs.cache.service.type }}
+  type: {{ .Values.dataService.docs.cache.service.type }}
   ports:
-    - port: {{ .Values.docs.cache.service.port }}
+    - port: {{ .Values.dataService.docs.cache.service.port }}
       protocol: TCP
-      {{- if (eq .Values.docs.cache.service.type "NodePort") }}
-      nodePort: {{ .Values.docs.cache.service.nodePort }}
+      {{- if (eq .Values.dataService.docs.cache.service.type "NodePort") }}
+      nodePort: {{ .Values.dataService.docs.cache.service.nodePort }}
       {{- end }}
   selector:
     app: docs-cache

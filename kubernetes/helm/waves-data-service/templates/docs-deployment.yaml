@@ -1,4 +1,4 @@
-{{- if .Values.docs.enabled }}
+{{- if .Values.dataService.docs.enabled }}
 {{- if .Capabilities.APIVersions.Has "apps/v1beta1" }}
 apiVersion: apps/v1beta1
 {{- else }}
@@ -28,8 +28,8 @@ spec:
         - name: docker-registry-creds
       containers:
         - name: docs
-          image: {{ .Values.docs.image }}:{{ .Values.docs.imageTag }}
-          imagePullPolicy: {{ .Values.docs.imagePullPolicy }}
+          image: {{ .Values.dataService.docs.image }}:{{ .Values.dataService.docs.imageTag }}
+          imagePullPolicy: {{ .Values.dataService.docs.imagePullPolicy }}
           env:
             - name: SWAGGER_JSON
               value: '/app/openapi.json'
@@ -46,7 +46,7 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 5
             successThreshold: 1
-          {{- with .Values.docs.resources }}
+          {{- with .Values.dataService.docs.resources }}
 {{ toYaml . | indent 10 }}
           {{- end }}
     {{- with .Values.nodeSelector }}

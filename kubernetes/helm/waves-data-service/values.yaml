@@ -8,8 +8,9 @@ postgresql:
   image:
     debug: true
 
-  # PostgreSQL server host (only for remote PostgreSQL)
-  # host: 'localhost'
+  # PostgreSQL server host, only for remote PostgreSQL (postgresql.enabled=false)
+  host: 'localhost'
+  port: 5432
 
   # Database name
   postgresqlDatabase: 'mainnet'
@@ -43,7 +44,7 @@ crawler:
 
   # Waves Node url. 
   # Used to get blockchain data via Node REST API
-  nodeUrl: 'http://data-service-node.wvservices.com:6869'
+  nodeUrl: 'http://nodes.wavesnodes.com'
   
   # How many blocks to fetch on single download request.
   blocksPerRequest: 50
@@ -106,7 +107,7 @@ dataService:
       port: 80
       # Manually set NodePort value
       # Requires service.type: NodePort
-      nodePort: 30001
+      nodePort: 30000
 
   # Candles calculation via exchange txs data
   candles:
@@ -157,45 +158,45 @@ dataService:
       #   memory: '160Mi'
       #   cpu: '200m'
 
-docs:
-  enabled: true
-  image: 'wavesplatform/data-service-docs'
-  imageTag: 'latest'
-  imagePullPolicy: Always
+  docs:
+    enabled: true
+    image: 'wavesplatform/data-service-docs'
+    imageTag: 'latest'
+    imagePullPolicy: Always
 
-  # host:port
-  # host - your k8s cluster host
-  # port - docs cache service port
-  url: 'localhost:30002'
+    # host:port
+    # host - your k8s cluster host
+    # port - docs cache service port
+    url: 'localhost:30002'
 
-  # Data service Docs Deployment resources
-  resources:
-    requests:
-      memory: '16Mi'
-      cpu: '5m'
-    limits:
-      memory: '32Mi'
-      cpu: '20m'
+    # Data service Docs Deployment resources
+    resources:
+      requests:
+        memory: '16Mi'
+        cpu: '5m'
+      limits:
+        memory: '32Mi'
+        cpu: '20m'
 
-  # Docs, same as DataService, has cache layer based on nginx
-  cache: 
-    # Docs cache Deployment resources
-    resources: {}
-    # 
-    # requests:
-    #   memory: '32Mi'
-    #   cpu: '10m'
-    # limits:
-    #   memory: '64Mi'
-    #   cpu: '50m'
+    # Docs, same as DataService, has cache layer based on nginx
+    cache: 
+      # Docs cache Deployment resources
+      resources: {}
+      # 
+      # requests:
+      #   memory: '32Mi'
+      #   cpu: '10m'
+      # limits:
+      #   memory: '64Mi'
+      #   cpu: '50m'
 
-    # Docs cache Service settings
-    service: 
-      type: NodePort
-      port: 80
-      # Manually set NodePort value
-      # Requires service.type: NodePort
-      nodePort: 30002
+      # Docs cache Service settings
+      service: 
+        type: NodePort
+        port: 80
+        # Manually set NodePort value
+        # Requires service.type: NodePort
+        nodePort: 30001
 
 # Allow to constrain pods to nodes with particular labels
 # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity 
