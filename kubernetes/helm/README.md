@@ -15,7 +15,7 @@ Essential parameters
 | -- | -- | -- | -- |
 | `postgresql.enabled` | `boolean` | `true` | Whether to use local PostgreSQL |
 | `postgresql.host` | `string` | | Database host, only for case with remote PostgreSQL instance (`postgresql.enabled=false`) |
-| `postgresql.port` | `number` | 5432 | Database port, only for case with remote PostgreSQL instance (`postgresql.enabled=false`) |
+| `postgresql.service.port` | `number` | 5432 | Database port, only for case with remote PostgreSQL instance (`postgresql.enabled=false`) |
 | `postgresql.postgresqlDatabase` | `string` | `mainnet` | Database name |
 | `postgresql.postgresqlPassword` | `string` | `mypass` | Password for superuser `postgres` |
 | `postgresql.writer.username` | `string` | `writer` | Username for user with write permissions (used by crawler, candles and pairs) |
