@@ -17,6 +17,8 @@ services:
       - ./waves-data:/var/lib/waves
   postgres:
     image: postgres:alpine
+    command: postgres -c shared_buffers=1024MB
+    shm_size: '1g'
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -58,3 +60,20 @@ services:
       MATCHER_SETTINGS_URL: https://matcher.wavesplatform.com/matcher/settings
     ports:
       - '3000:3000'
+  candles:
+    image: wavesplatform/data-service-candles
+    restart: always
+    depends_on:
+      - data-service
+    environment:
+      PORT: 3000
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: blockchain
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGPOOLSIZE: 20
+      LOG_LEVEL: info
+      CANDLES_UPDATE_INTERVAL: 2500
+      CANDLES_UPDATE_TIMEOUT: 20000
+      RECALCULATE_ALL_CANDLES_ON_START: 'false'
